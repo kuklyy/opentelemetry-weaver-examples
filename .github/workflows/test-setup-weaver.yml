@@ -1,0 +1,106 @@
+name: Test Setup Weaver Action
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-windows:
+    name: Test on Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Weaver
+        uses: kuklyy/weaver/.github/actions/setup-weaver@kuklyy/setup-weaver-action
+
+      - name: Verify Weaver installation
+        run: |
+          weaver --version
+          weaver --help
+
+      - name: Test Weaver commands
+        run: |
+          weaver registry check -r ./basic/model --diagnostic-format gh_workflow_command
+          weaver registry resolve -r ./basic/model -o resolved.json
+
+  test-linux:
+    name: Test on Linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Weaver
+        uses: kuklyy/weaver/.github/actions/setup-weaver@kuklyy/setup-weaver-action
+
+      - name: Verify Weaver installation
+        run: |
+          weaver --version
+          weaver --help
+
+      - name: Test Weaver commands
+        run: |
+          weaver registry check -r ./basic/model --diagnostic-format gh_workflow_command
+          weaver registry resolve -r ./basic/model -o resolved.json
+
+  test-macos:
+    name: Test on macOS
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Weaver
+        uses: kuklyy/weaver/.github/actions/setup-weaver@kuklyy/setup-weaver-action
+
+      - name: Verify Weaver installation
+        run: |
+          weaver --version
+          weaver --help
+
+      - name: Test Weaver commands
+        run: |
+          weaver registry check -r ./basic/model --diagnostic-format gh_workflow_command
+          weaver registry resolve -r ./basic/model -o resolved.json
+
+  test-cache-behavior:
+    name: Test Cache on Linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Weaver (first run - no cache)
+        id: setup1
+        uses: kuklyy/weaver/.github/actions/setup-weaver@kuklyy/setup-weaver-action
+
+      - name: Verify first installation
+        run: |
+          echo "Installed version: ${{ steps.setup1.outputs.version }}"
+          weaver --version
+
+      - name: Clear PATH to simulate fresh step
+        run: echo "Simulating cache restore scenario"
+
+      - name: Setup Weaver again (should use cache)
+        id: setup2
+        uses: kuklyy/weaver/.github/actions/setup-weaver@kuklyy/setup-weaver-action
+
+      - name: Verify cached installation
+        run: |
+          echo "Cached version: ${{ steps.setup2.outputs.version }}"
+          weaver --version
+
+  test-specific-version:
+    name: Test Specific Version Install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Weaver with specific version
+        id: setup
+        uses: kuklyy/weaver/.github/actions/setup-weaver@kuklyy/setup-weaver-action
+        with:
+          version: '0.10.0'
+
+      - name: Verify specific version
+        run: |
+          echo "Installed version: ${{ steps.setup.outputs.version }}"
+          weaver --version | grep "0.10.0"
