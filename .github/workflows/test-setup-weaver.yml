@@ -1,6 +1,9 @@
 name: Test Setup Weaver Action
 
 on:
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
